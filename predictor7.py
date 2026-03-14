@@ -10,7 +10,7 @@ warnings.filterwarnings('ignore')
 
 # 加载模型和数据
 model = joblib.load('XGBoost.pkl')
-test_dataset = pd.read_xlsx('data.xlsx')
+test_dataset = pd.read_excel('data.xlsx')
 
 feature_names = [
     "age", "nihss_admit", "adl_total", "pre_apt", "post_gastric_tube", "sbp_baseline", "sbp_admit", "agitation", "anc_total", "bnp_total"
