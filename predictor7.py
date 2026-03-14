@@ -10,13 +10,13 @@ warnings.filterwarnings('ignore')
 
 # ====================== 页面配置 ======================
 st.set_page_config(
-    page_title="急性缺血性脑卒中血管内治疗术后症状性出血转化风险预测器",
+    page_title="AIS患者血管内治疗术后症状性出血转化风险预测器",
     layout="wide"
 )
-st.title("急性缺血性脑卒中血管内治疗术后症状性出血转化风险预测器")
+st.title("AIS患者血管内治疗术后症状性出血转化风险预测器")
 st.markdown("### 请填写以下信息，点击预测获取风险评估结果")
 
-# ====================== 加载模型和数据 ======================
+# ====================== 加载模型和数据（只加载一次）======================
 model = joblib.load('XGBoost.pkl')
 test_dataset = pd.read_excel('data.xlsx')
 
@@ -32,6 +32,21 @@ missing_features = [f for f in feature_names if f not in test_dataset.columns]
 if missing_features:
     st.error(f"数据文件中缺少以下特征列：{missing_features}。请检查 data.xlsx 的列名是否正确。")
     st.stop()
+
+# 提取用于LIME的训练数据（只取特征部分，且可考虑采样以加速）
+X_train_lime = test_dataset[feature_names].values
+# 如果数据量很大，可以采样一部分用于LIME，例如：
+# if X_train_lime.shape[0] > 1000:
+#     idx = np.random.choice(X_train_lime.shape[0], 1000, replace=False)
+#     X_train_lime = X_train_lime[idx]
+
+# 初始化LIME解释器（只需一次）
+lime_explainer = LimeTabularExplainer(
+    training_data=X_train_lime,
+    feature_names=feature_names,
+    class_names=['低风险', '高风险'],
+    mode='classification'
+)
 
 # ====================== 输入组件（每行两个） ======================
 # 第1行
@@ -85,7 +100,7 @@ if st.button("预测"):
     proba = model.predict_proba(input_df)[0]
     risk_prob = proba[1]  # 高风险概率
 
-    # 根据阈值划分风险等级（可调整阈值）
+    # 根据阈值划分风险等级
     if risk_prob < 0.20:
         pred_class = "低风险"
         advice = f"模型预测您的症状性出血风险概率为 {risk_prob:.1%}，属于低风险。建议继续保持当前治疗方案，定期随访。"
@@ -103,15 +118,8 @@ if st.button("预测"):
     st.subheader("💡 健康建议")
     st.write(advice)
 
-    # ====================== LIME 解释 ======================
+    # ====================== LIME 解释（使用已初始化的解释器）======================
     st.subheader("🔍 LIME特征贡献解释")
-    X_train_lime = test_dataset[feature_names].values
-    lime_explainer = LimeTabularExplainer(
-        training_data=X_train_lime,
-        feature_names=feature_names,
-        class_names=['低风险', '高风险'],
-        mode='classification'
-    )
     lime_exp = lime_explainer.explain_instance(
         data_row=input_df.values.flatten(),
         predict_fn=model.predict_proba,
