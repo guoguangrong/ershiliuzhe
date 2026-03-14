@@ -12,19 +12,20 @@ st.set_page_config(
     layout="wide"
 )
 
-# 自定义CSS：放大输入标签和结果文字
+# 自定义CSS：精确控制字体大小和粗细
 st.markdown("""
 <style>
-    /* 三级标题样式（与输入标签大小匹配） */
+    /* 三级标题样式（用于“请填写以下信息...”） */
     .stMarkdown h3 {
         font-size: 1.8rem;
+        font-weight: 600;
     }
-    /* 强制数字输入框和选择框的标签字体变大 */
-    .stNumberInput > label, .stSelectbox > label {
-        font-size: 1.8rem !important;
-        font-weight: 600 !important;
+    /* 输入标签：比h3小一号，不加粗 */
+    .stNumberInput label, .stSelectbox label {
+        font-size: 1.6rem !important;
+        font-weight: normal !important;
         line-height: 1.4 !important;
-        margin-bottom: 0.3rem !important;
+        margin-bottom: 0.2rem !important;
     }
     /* 调整输入框内文字大小 */
     .stNumberInput input, .stSelectbox div[data-baseweb="select"] {
@@ -34,7 +35,7 @@ st.markdown("""
     .result-area h3 {
         font-size: 2.0rem;
     }
-    .result-area p, .result-area div {
+    .result-area p, .result-area div, .result-area .stMarkdown {
         font-size: 1.6rem;
     }
 </style>
@@ -61,9 +62,9 @@ if missing_features:
     st.stop()
 
 # ====================== 创建左右两列布局 ======================
-left_col, right_col = st.columns([3, 2])  # 左侧宽3，右侧宽2，可根据需要调整
+left_col, right_col = st.columns([3, 2])  # 左侧宽3，右侧宽2
 
-# ====================== 左侧：输入组件 ======================
+# ====================== 左侧：输入组件（每行两个）======================
 with left_col:
     # 第1行：年龄、入院NIHSS评分
     col1, col2 = st.columns(2)
@@ -104,7 +105,7 @@ with left_col:
     with col2:
         post_gastric_tube = st.selectbox("术后是否留置胃管", options=[0, 1], format_func=lambda x: "是" if x == 1 else "否")
 
-    # 预测按钮（居中）
+    # 预测按钮（居中、蓝色）
     left, center, right = st.columns([1, 1, 1])
     with center:
         predict_clicked = st.button("预测", type="primary", use_container_width=True)
@@ -135,8 +136,8 @@ with right_col:
             pred_class = "高风险"
             advice = f"模型预测您的症状性出血风险概率为 {risk_prob:.1%}，属于高风险。建议立即就医，加强监测和预防措施。"
 
-        st.write(f"**预测分类**：{pred_class}")
-        st.write(f"**预测概率**：{risk_prob:.2%}")
+        st.write(f"**预测分类：** {pred_class}")
+        st.write(f"**预测概率：** {risk_prob:.2%}")
 
         st.subheader("💡 健康建议")
         st.write(advice)
