@@ -12,22 +12,22 @@ st.set_page_config(
     layout="wide"
 )
 
-# 自定义CSS：使所有输入标签字体变大（与h3标题一致）
+# 自定义CSS：强制放大输入标签字体
 st.markdown("""
 <style>
-    /* 三级标题样式 */
-    .stMarkdown h3 {
-        font-size: 1.6rem;
+    /* 强制所有数字输入框和选择框的标签字体变大 */
+    label[data-testid="stWidgetLabel"] p {
+        font-size: 1.8rem !important;
+        font-weight: 600 !important;
     }
-    /* 强制数字输入框和选择框的标签字体变大 */
-    .stNumberInput label, .stSelectbox label {
-        font-size: 1.6rem !important;
+    /* 备用选择器，以防上面不生效 */
+    .stNumberInput > label, .stSelectbox > label {
+        font-size: 1.8rem !important;
         font-weight: 600 !important;
         line-height: 1.4 !important;
         margin-bottom: 0.3rem !important;
-        color: #000000 !important;  /* 可选：加深颜色 */
     }
-    /* 可选：调整输入框内文字大小，使其与标签协调 */
+    /* 调整输入框内文字大小 */
     .stNumberInput input, .stSelectbox div[data-baseweb="select"] {
         font-size: 1.2rem;
     }
