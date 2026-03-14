@@ -24,7 +24,7 @@ model = joblib.load('XGBoost.pkl')
 test_dataset = pd.read_excel('data.xlsx')
 
 # 显示数据列名（用于调试，部署后可以注释掉）
-st.write("数据文件中的列名：", test_dataset.columns.tolist())
+# st.write("数据文件中的列名：", test_dataset.columns.tolist())
 
 # 定义特征列表（根据实际列名修改，注意 "agitation " 末尾有空格）
 feature_names = [
