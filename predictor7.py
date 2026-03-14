@@ -3,27 +3,25 @@ import streamlit as st
 import joblib
 import numpy as np
 import pandas as pd
-from lime.lime_tabular import LimeTabularExplainer
-import streamlit.components.v1 as components
 import warnings
 warnings.filterwarnings('ignore')
 
 # ====================== 页面配置 ======================
 st.set_page_config(
-    page_title="急性缺血性脑卒中血管内治疗术后症状性出血转化风险预测器",
+    page_title="AIS患者血管内治疗术后症状性出血转化风险预测器",
     layout="wide"
 )
-st.title("急性缺血性脑卒中血管内治疗术后症状性出血转化风险预测器")
+st.title("AIS患者血管内治疗术后症状性出血转化风险预测器")
 st.markdown("### 请填写以下信息，点击预测获取风险评估结果")
 
 # ====================== 加载模型和数据 ======================
 model = joblib.load('XGBoost.pkl')
-test_dataset = pd.read_excel('data.xlsx')
+test_dataset = pd.read_excel('data.xlsx')  # 仅用于列名检查，不再用于LIME
 
-# 定义特征列表（根据实际列名修改，此处已去掉空格）
+# 定义特征列表（根据实际列名修改）
 feature_names = [
     "age", "nihss_admit", "adl_total", "pre_apt", "post_gastric_tube",
-    "sbp_baseline", "sbp_admit", "agitation",   # 注意：去掉了末尾空格
+    "sbp_baseline", "sbp_admit", "agitation",   # 注意：无空格
     "anc_total", "bnp_total"
 ]
 
@@ -32,21 +30,6 @@ missing_features = [f for f in feature_names if f not in test_dataset.columns]
 if missing_features:
     st.error(f"数据文件中缺少以下特征列：{missing_features}。请检查 data.xlsx 的列名是否正确。")
     st.stop()
-
-# 提取用于LIME的训练数据（只取特征部分，可采样加速）
-X_train_lime = test_dataset[feature_names].values
-# 如果数据量很大，可以采样一部分，例如：
-# if X_train_lime.shape[0] > 1000:
-#     idx = np.random.choice(X_train_lime.shape[0], 1000, replace=False)
-#     X_train_lime = X_train_lime[idx]
-
-# 初始化LIME解释器（只需一次）
-lime_explainer = LimeTabularExplainer(
-    training_data=X_train_lime,
-    feature_names=feature_names,
-    class_names=['低风险', '高风险'],
-    mode='classification'
-)
 
 # ====================== 输入组件（每行两个） ======================
 # 第1行
@@ -88,8 +71,15 @@ with col1:
 with col2:
     post_gastric_tube = st.selectbox("术后是否留置胃管", options=[0, 1], format_func=lambda x: "是" if x == 1 else "否")
 
-# ====================== 预测 ======================
-if st.button("预测"):
+# ====================== 预测按钮（居中、蓝色、白色文字）======================
+# 使用三列布局将按钮居中
+left, center, right = st.columns([1, 1, 1])
+with center:
+    # type="primary" 使按钮为蓝色背景，白色文字
+    predict_clicked = st.button("预测", type="primary", use_container_width=True)
+
+# ====================== 预测结果 ======================
+if predict_clicked:
     # 构建特征数组（顺序必须与 feature_names 一致）
     feature_values = [
         age, nihss_admit, adl_total, pre_apt, post_gastric_tube,
@@ -117,13 +107,3 @@ if st.button("预测"):
 
     st.subheader("💡 健康建议")
     st.write(advice)
-
-    # ====================== LIME 解释 ======================
-    st.subheader("🔍 LIME特征贡献解释")
-    lime_exp = lime_explainer.explain_instance(
-        data_row=input_df.values.flatten(),
-        predict_fn=model.predict_proba,
-        num_features=10
-    )
-    lime_html = lime_exp.as_html(show_table=True)
-    components.html(lime_html, height=600, scrolling=True)
