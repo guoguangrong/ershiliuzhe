@@ -12,15 +12,20 @@ st.set_page_config(
     layout="wide"
 )
 
-# 自定义CSS：精确控制字体大小和粗细
+# 自定义CSS：强力放大输入标签和结果文字
 st.markdown("""
 <style>
     /* 三级标题样式（用于“请填写以下信息...”） */
     .stMarkdown h3 {
-        font-size: 1.8rem;
-        font-weight: 600;
+        font-size: 1.8rem !important;
+        font-weight: 600 !important;
     }
-    /* 输入标签：比h3小一号，不加粗 */
+    /* 输入标签：比h3小一号，不加粗，强制覆盖所有 */
+    label[data-testid="stWidgetLabel"] p {
+        font-size: 1.6rem !important;
+        font-weight: normal !important;
+    }
+    /* 备用选择器，确保覆盖 */
     .stNumberInput label, .stSelectbox label {
         font-size: 1.6rem !important;
         font-weight: normal !important;
@@ -29,14 +34,14 @@ st.markdown("""
     }
     /* 调整输入框内文字大小 */
     .stNumberInput input, .stSelectbox div[data-baseweb="select"] {
-        font-size: 1.2rem;
+        font-size: 1.2rem !important;
     }
     /* 右侧结果区域的字体放大 */
     .result-area h3 {
-        font-size: 2.0rem;
+        font-size: 2.0rem !important;
     }
     .result-area p, .result-area div, .result-area .stMarkdown {
-        font-size: 1.6rem;
+        font-size: 1.6rem !important;
     }
 </style>
 """, unsafe_allow_html=True)
