@@ -12,22 +12,23 @@ st.set_page_config(
     layout="wide"
 )
 
-# 自定义CSS：增大输入标签的字体，并覆盖所有可能的情况
+# 自定义CSS：使输入标签字体与h3标题一样大
 st.markdown("""
 <style>
-    /* 针对所有数字输入框和选择框的标签 */
-    div[data-testid="stNumberInput"] label,
-    div[data-testid="stSelectbox"] label {
-        font-size: 1.4rem !important;
-        font-weight: 500 !important;
-        line-height: 1.5 !important;
-    }
-    /* 可选：增大标题字体 */
-    .stMarkdown h1 {
-        font-size: 2.5rem;
-    }
+    /* 三级标题样式（默认） */
     .stMarkdown h3 {
         font-size: 1.5rem;
+    }
+    /* 数字输入框标签 */
+    .stNumberInput label, .stSelectbox label {
+        font-size: 1.5rem !important;
+        font-weight: 500 !important;
+        line-height: 1.4 !important;
+        margin-bottom: 0.25rem !important;
+    }
+    /* 可选：调整输入框本身的高度，使其更协调 */
+    .stNumberInput input, .stSelectbox div[data-baseweb="select"] {
+        font-size: 1.2rem;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -53,28 +54,24 @@ if missing_features:
     st.stop()
 
 # ====================== 输入组件（每行两个） ======================
-# 第1行
 col1, col2 = st.columns(2)
 with col1:
     age = st.number_input("年龄", min_value=0.0, value=0.0, step=1.0, format="%.2f")
 with col2:
     nihss_admit = st.number_input("入院NIHSS评分", min_value=0.0, value=0.0, step=0.5, format="%.2f")
 
-# 第2行
 col1, col2 = st.columns(2)
 with col1:
     adl_total = st.number_input("基线自理能力评分", min_value=0.0, value=0.0, step=1.0, format="%.2f")
 with col2:
     pre_apt = st.selectbox("术前是否使用抗凝抗板药物", options=[0, 1], format_func=lambda x: "是" if x == 1 else "否")
 
-# 第3行
 col1, col2 = st.columns(2)
 with col1:
     sbp_baseline = st.number_input("基线收缩压", min_value=0.0, value=0.0, step=1.0, format="%.2f")
 with col2:
     sbp_admit = st.number_input("入院收缩压", min_value=0.0, value=0.0, step=1.0, format="%.2f")
 
-# 第4行
 col1, col2 = st.columns(2)
 with col1:
     agitation = st.selectbox(
@@ -85,7 +82,6 @@ with col1:
 with col2:
     anc_total = st.number_input("基线中性粒细胞计数", min_value=0.0, value=0.0, step=0.1, format="%.2f")
 
-# 第5行
 col1, col2 = st.columns(2)
 with col1:
     bnp_total = st.number_input("基线BNP", min_value=0.0, value=0.0, step=1.0, format="%.2f")
