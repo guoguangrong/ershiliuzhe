@@ -12,15 +12,14 @@ st.set_page_config(
     layout="wide"
 )
 
-# 自定义CSS：强制放大输入标签字体
+# 自定义CSS：放大输入标签和结果文字
 st.markdown("""
 <style>
-    /* 强制所有数字输入框和选择框的标签字体变大 */
-    label[data-testid="stWidgetLabel"] p {
-        font-size: 1.8rem !important;
-        font-weight: 600 !important;
+    /* 三级标题样式（与输入标签大小匹配） */
+    .stMarkdown h3 {
+        font-size: 1.8rem;
     }
-    /* 备用选择器，以防上面不生效 */
+    /* 强制数字输入框和选择框的标签字体变大 */
     .stNumberInput > label, .stSelectbox > label {
         font-size: 1.8rem !important;
         font-weight: 600 !important;
@@ -30,6 +29,17 @@ st.markdown("""
     /* 调整输入框内文字大小 */
     .stNumberInput input, .stSelectbox div[data-baseweb="select"] {
         font-size: 1.2rem;
+    }
+    /* 预测结果区域的字体放大 */
+    div[data-testid="stMarkdown"] h3 {
+        font-size: 2.0rem;
+    }
+    div[data-testid="stMarkdown"] p {
+        font-size: 1.6rem;
+    }
+    /* 如果st.write生成的文本不在p中，针对div中的文本也放大 */
+    div[data-testid="stMarkdown"] div {
+        font-size: 1.6rem;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -44,7 +54,7 @@ test_dataset = pd.read_excel('data.xlsx')
 # 定义特征列表（根据实际列名修改，注意无空格）
 feature_names = [
     "age", "nihss_admit", "adl_total", "pre_apt", "post_gastric_tube",
-    "sbp_baseline", "sbp_admit", "agitation ",
+    "sbp_baseline", "sbp_admit", "agitation ",   # 注意：如果数据中无空格，请删除此处空格
     "anc_total", "bnp_total"
 ]
 
@@ -54,26 +64,27 @@ if missing_features:
     st.error(f"数据文件中缺少以下特征列：{missing_features}。请检查 data.xlsx 的列名是否正确。")
     st.stop()
 
-# ====================== 输入组件（每行两个） ======================
-col1, col2 = st.columns(2)
+# ====================== 输入组件（每行三个） ======================
+# 第1行：年龄、入院NIHSS评分、基线自理能力评分
+col1, col2, col3 = st.columns(3)
 with col1:
     age = st.number_input("年龄", min_value=0.0, value=0.0, step=1.0, format="%.2f")
 with col2:
     nihss_admit = st.number_input("入院NIHSS评分", min_value=0.0, value=0.0, step=0.5, format="%.2f")
-
-col1, col2 = st.columns(2)
-with col1:
+with col3:
     adl_total = st.number_input("基线自理能力评分", min_value=0.0, value=0.0, step=1.0, format="%.2f")
-with col2:
-    pre_apt = st.selectbox("术前是否使用抗凝抗板药物", options=[0, 1], format_func=lambda x: "是" if x == 1 else "否")
 
-col1, col2 = st.columns(2)
+# 第2行：术前抗凝药物、基线收缩压、入院收缩压
+col1, col2, col3 = st.columns(3)
 with col1:
-    sbp_baseline = st.number_input("基线收缩压", min_value=0.0, value=0.0, step=1.0, format="%.2f")
+    pre_apt = st.selectbox("术前是否使用抗凝抗板药物", options=[0, 1], format_func=lambda x: "是" if x == 1 else "否")
 with col2:
+    sbp_baseline = st.number_input("基线收缩压", min_value=0.0, value=0.0, step=1.0, format="%.2f")
+with col3:
     sbp_admit = st.number_input("入院收缩压", min_value=0.0, value=0.0, step=1.0, format="%.2f")
 
-col1, col2 = st.columns(2)
+# 第3行：术后躁动情况、基线中性粒细胞计数、基线BNP
+col1, col2, col3 = st.columns(3)
 with col1:
     agitation = st.selectbox(
         "术后躁动情况？",
@@ -82,12 +93,17 @@ with col1:
     )
 with col2:
     anc_total = st.number_input("基线中性粒细胞计数", min_value=0.0, value=0.0, step=0.1, format="%.2f")
-
-col1, col2 = st.columns(2)
-with col1:
+with col3:
     bnp_total = st.number_input("基线BNP", min_value=0.0, value=0.0, step=1.0, format="%.2f")
+
+# 第4行：术后是否留置胃管（单独一行，居中）
+col1, col2, col3 = st.columns(3)
+with col1:
+    st.empty()  # 空列占位
 with col2:
     post_gastric_tube = st.selectbox("术后是否留置胃管", options=[0, 1], format_func=lambda x: "是" if x == 1 else "否")
+with col3:
+    st.empty()
 
 # ====================== 预测按钮（居中、蓝色、白色文字）======================
 left, center, right = st.columns([1, 1, 1])
