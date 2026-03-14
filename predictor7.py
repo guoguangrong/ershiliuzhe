@@ -20,16 +20,17 @@ st.markdown("### 请填写以下信息，点击预测获取风险评估结果")
 # 请确保模型文件（如 XGBoost.pkl）与脚本在同一目录下
 model = joblib.load('XGBoost.pkl')
 
-# 加载数据（用于 LIME 解释），如果是 CSV 文件请使用 pd.read_csv
+# 加载数据（用于 LIME 解释）
 test_dataset = pd.read_excel('data.xlsx')
 
 # 显示数据列名（用于调试，部署后可以注释掉）
 st.write("数据文件中的列名：", test_dataset.columns.tolist())
 
-# 定义特征列表（请根据数据实际列名修改！）
+# 定义特征列表（根据实际列名修改，注意 "agitation " 末尾有空格）
 feature_names = [
     "age", "nihss_admit", "adl_total", "pre_apt", "post_gastric_tube",
-    "sbp_baseline", "sbp_admit", "agitation", "anc_total", "bnp_total"
+    "sbp_baseline", "sbp_admit", "agitation ",   # 注意末尾空格
+    "anc_total", "bnp_total"
 ]
 
 # 检查所有特征列是否存在
@@ -65,7 +66,7 @@ if st.button("预测"):
         post_gastric_tube,
         sbp_baseline,
         sbp_admit,
-        agitation,
+        agitation,          # 输入变量名不变
         anc_total,
         bnp_total
     ]
