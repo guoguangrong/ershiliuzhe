@@ -10,20 +10,20 @@ warnings.filterwarnings('ignore')
 
 # ====================== 页面配置 ======================
 st.set_page_config(
-    page_title="AIS患者血管内治疗术后症状性出血转化风险预测器",
+    page_title="急性缺血性脑卒中血管内治疗术后症状性出血转化风险预测器",
     layout="wide"
 )
-st.title("AIS患者血管内治疗术后症状性出血转化风险预测器")
+st.title("急性缺血性脑卒中血管内治疗术后症状性出血转化风险预测器")
 st.markdown("### 请填写以下信息，点击预测获取风险评估结果")
 
-# ====================== 加载模型和数据（只加载一次）======================
+# ====================== 加载模型和数据 ======================
 model = joblib.load('XGBoost.pkl')
 test_dataset = pd.read_excel('data.xlsx')
 
-# 定义特征列表（根据实际列名修改，注意 "agitation " 末尾有空格）
+# 定义特征列表（根据实际列名修改，此处已去掉空格）
 feature_names = [
     "age", "nihss_admit", "adl_total", "pre_apt", "post_gastric_tube",
-    "sbp_baseline", "sbp_admit", "agitation ",   # 注意末尾空格
+    "sbp_baseline", "sbp_admit", "agitation",   # 注意：去掉了末尾空格
     "anc_total", "bnp_total"
 ]
 
@@ -33,9 +33,9 @@ if missing_features:
     st.error(f"数据文件中缺少以下特征列：{missing_features}。请检查 data.xlsx 的列名是否正确。")
     st.stop()
 
-# 提取用于LIME的训练数据（只取特征部分，且可考虑采样以加速）
+# 提取用于LIME的训练数据（只取特征部分，可采样加速）
 X_train_lime = test_dataset[feature_names].values
-# 如果数据量很大，可以采样一部分用于LIME，例如：
+# 如果数据量很大，可以采样一部分，例如：
 # if X_train_lime.shape[0] > 1000:
 #     idx = np.random.choice(X_train_lime.shape[0], 1000, replace=False)
 #     X_train_lime = X_train_lime[idx]
@@ -118,7 +118,7 @@ if st.button("预测"):
     st.subheader("💡 健康建议")
     st.write(advice)
 
-    # ====================== LIME 解释（使用已初始化的解释器）======================
+    # ====================== LIME 解释 ======================
     st.subheader("🔍 LIME特征贡献解释")
     lime_exp = lime_explainer.explain_instance(
         data_row=input_df.values.flatten(),
