@@ -8,15 +8,34 @@ warnings.filterwarnings('ignore')
 
 # ====================== 页面配置 ======================
 st.set_page_config(
-    page_title="AIS患者血管内治疗术后症状性出血转化风险预测器",
+    page_title="急性缺血性脑卒中血管内治疗术后症状性出血转化风险预测器",
     layout="wide"
 )
-st.title("AIS患者血管内治疗术后症状性出血转化风险预测器")
+
+# 自定义 CSS：增大输入标签的字体
+st.markdown("""
+<style>
+    /* 增大所有 number_input 和 selectbox 的标签字体 */
+    .stNumberInput label, .stSelectbox label {
+        font-size: 1.2rem !important;
+        font-weight: 500;
+    }
+    /* 也可以增大标题和描述文字（可选） */
+    .stMarkdown h1 {
+        font-size: 2.5rem;
+    }
+    .stMarkdown h3 {
+        font-size: 1.5rem;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+st.title("急性缺血性脑卒中血管内治疗术后症状性出血转化风险预测器")
 st.markdown("### 请填写以下信息，点击预测获取风险评估结果")
 
 # ====================== 加载模型和数据 ======================
 model = joblib.load('XGBoost.pkl')
-test_dataset = pd.read_excel('data.xlsx')  # 仅用于列名检查，不再用于LIME
+test_dataset = pd.read_excel('data.xlsx')
 
 # 定义特征列表（根据实际列名修改）
 feature_names = [
@@ -72,15 +91,12 @@ with col2:
     post_gastric_tube = st.selectbox("术后是否留置胃管", options=[0, 1], format_func=lambda x: "是" if x == 1 else "否")
 
 # ====================== 预测按钮（居中、蓝色、白色文字）======================
-# 使用三列布局将按钮居中
 left, center, right = st.columns([1, 1, 1])
 with center:
-    # type="primary" 使按钮为蓝色背景，白色文字
     predict_clicked = st.button("预测", type="primary", use_container_width=True)
 
 # ====================== 预测结果 ======================
 if predict_clicked:
-    # 构建特征数组（顺序必须与 feature_names 一致）
     feature_values = [
         age, nihss_admit, adl_total, pre_apt, post_gastric_tube,
         sbp_baseline, sbp_admit, agitation, anc_total, bnp_total
@@ -88,9 +104,8 @@ if predict_clicked:
     input_df = pd.DataFrame([feature_values], columns=feature_names)
 
     proba = model.predict_proba(input_df)[0]
-    risk_prob = proba[1]  # 高风险概率
+    risk_prob = proba[1]
 
-    # 根据阈值划分风险等级
     if risk_prob < 0.20:
         pred_class = "低风险"
         advice = f"模型预测您的症状性出血风险概率为 {risk_prob:.1%}，属于低风险。建议继续保持当前治疗方案，定期随访。"
