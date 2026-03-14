@@ -9,7 +9,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 # 加载模型和数据
-model = joblib.load('xgboost.pkl')
+model = joblib.load('XGBoost.pkl')
 test_dataset = pd.read_xlsx('data.xlsx')
 
 feature_names = [
