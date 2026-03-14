@@ -43,7 +43,16 @@ post_gastric_tube = st.selectbox("术后是否留置胃管", options=[0, 1], for
 # 预测
 if st.button("预测"):
     feature_values = [
-        age, nihss_admit, adl_total, pre_apt, post_gastric_tube, sbp_baseline, sbp_admit, agitation, anc_total, bnp_total
+        age_num,                # 修正变量名
+        nihss_admit_num,
+        adl_total_num,
+        pre_apt,
+        post_gastric_tube,
+        sbp_baseline_num,
+        sbp_admit_num,
+        agitation,
+        anc_total_num,
+        bnp_total_num
     ]
     input_df = pd.DataFrame([feature_values], columns=feature_names)
 
@@ -61,7 +70,7 @@ if st.button("预测"):
         pred_class = "高风险"
         advice = f"模型预测您的症状性出血风险概率为 {risk_prob:.1%}，属于高风险。建议立即就医，加强监测和预防措施。"
 
-    # 显示预测结果（仿示例格式）
+    # 显示预测结果
     st.subheader("📊 预测结果")
     st.write(f"**预测分类**：{pred_class}")
     st.write(f"**预测概率**：{risk_prob:.2%}")
@@ -70,7 +79,7 @@ if st.button("预测"):
     st.subheader("💡 健康建议")
     st.write(advice)
 
-    # LIME解释（不变）
+    # LIME解释
     st.subheader("🔍 LIME特征贡献解释")
     X_train_lime = test_dataset[feature_names].values
     lime_explainer = LimeTabularExplainer(
@@ -82,7 +91,7 @@ if st.button("预测"):
     lime_exp = lime_explainer.explain_instance(
         data_row=input_df.values.flatten(),
         predict_fn=model.predict_proba,
-        num_features=12
+        num_features=10   # 改为10
     )
     lime_html = lime_exp.as_html(show_table=True)
     components.html(lime_html, height=600, scrolling=True)
