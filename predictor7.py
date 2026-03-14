@@ -12,15 +12,17 @@ st.set_page_config(
     layout="wide"
 )
 
-# 自定义 CSS：增大输入标签的字体
+# 自定义CSS：增大输入标签的字体，并覆盖所有可能的情况
 st.markdown("""
 <style>
-    /* 增大所有 number_input 和 selectbox 的标签字体 */
-    .stNumberInput label, .stSelectbox label {
-        font-size: 1.2rem !important;
-        font-weight: 500;
+    /* 针对所有数字输入框和选择框的标签 */
+    div[data-testid="stNumberInput"] label,
+    div[data-testid="stSelectbox"] label {
+        font-size: 1.4rem !important;
+        font-weight: 500 !important;
+        line-height: 1.5 !important;
     }
-    /* 也可以增大标题和描述文字（可选） */
+    /* 可选：增大标题字体 */
     .stMarkdown h1 {
         font-size: 2.5rem;
     }
@@ -37,10 +39,10 @@ st.markdown("### 请填写以下信息，点击预测获取风险评估结果")
 model = joblib.load('XGBoost.pkl')
 test_dataset = pd.read_excel('data.xlsx')
 
-# 定义特征列表（根据实际列名修改）
+# 定义特征列表（根据实际列名修改，注意无空格）
 feature_names = [
     "age", "nihss_admit", "adl_total", "pre_apt", "post_gastric_tube",
-    "sbp_baseline", "sbp_admit", "agitation ",   # 注意：无空格
+    "sbp_baseline", "sbp_admit", "agitation ",
     "anc_total", "bnp_total"
 ]
 
