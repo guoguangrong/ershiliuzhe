@@ -74,30 +74,30 @@ if missing_features:
 # ====================== 创建左右两列布局 ======================
 left_col, right_col = st.columns([3, 2])
 
-# ====================== 左侧：输入组件（每行两个）======================
+# ====================== 左侧：输入组件（每行两个，带单位）======================
 with left_col:
-    # 第1行：年龄、入院NIHSS评分
+    # 第1行：年龄 (岁)、入院NIHSS评分 (分)
     col1, col2 = st.columns(2)
     with col1:
-        age = st.number_input("年龄", min_value=0.0, value=0.0, step=1.0, format="%.2f")
+        age = st.number_input("年龄 (岁)", min_value=0.0, value=0.0, step=1.0, format="%.2f")
     with col2:
-        nihss_admit = st.number_input("入院NIHSS评分", min_value=0.0, value=0.0, step=0.5, format="%.2f")
+        nihss_admit = st.number_input("入院NIHSS评分 (分)", min_value=0.0, value=0.0, step=0.5, format="%.2f")
 
-    # 第2行：基线自理能力评分、术前抗凝药物
+    # 第2行：基线自理能力评分 (分)、术前是否使用抗凝抗板药物
     col1, col2 = st.columns(2)
     with col1:
-        adl_total = st.number_input("基线自理能力评分", min_value=0.0, value=0.0, step=1.0, format="%.2f")
+        adl_total = st.number_input("基线自理能力评分 (分)", min_value=0.0, value=0.0, step=1.0, format="%.2f")
     with col2:
         pre_apt = st.selectbox("术前是否使用抗凝抗板药物", options=[0, 1], format_func=lambda x: "是" if x == 1 else "否")
 
-    # 第3行：基线收缩压、入院收缩压
+    # 第3行：基线收缩压 (mmHg)、入院收缩压 (mmHg)
     col1, col2 = st.columns(2)
     with col1:
-        sbp_baseline = st.number_input("基线收缩压", min_value=0.0, value=0.0, step=1.0, format="%.2f")
+        sbp_baseline = st.number_input("基线收缩压 (mmHg)", min_value=0.0, value=0.0, step=1.0, format="%.2f")
     with col2:
-        sbp_admit = st.number_input("入院收缩压", min_value=0.0, value=0.0, step=1.0, format="%.2f")
+        sbp_admit = st.number_input("入院收缩压 (mmHg)", min_value=0.0, value=0.0, step=1.0, format="%.2f")
 
-    # 第4行：术后躁动情况、基线中性粒细胞计数
+    # 第4行：术后躁动情况？、基线中性粒细胞计数 (×10⁹/L)
     col1, col2 = st.columns(2)
     with col1:
         agitation = st.selectbox(
@@ -106,12 +106,12 @@ with left_col:
             format_func=lambda x: {0: "无", 1: "轻度躁动", 2: "中度躁动", 3: "重度躁动"}[x]
         )
     with col2:
-        anc_total = st.number_input("基线中性粒细胞计数", min_value=0.0, value=0.0, step=0.1, format="%.2f")
+        anc_total = st.number_input("基线中性粒细胞计数 (×10⁹/L)", min_value=0.0, value=0.0, step=0.1, format="%.2f")
 
-    # 第5行：基线BNP、术后是否留置胃管
+    # 第5行：基线BNP (pg/mL)、术后是否留置胃管
     col1, col2 = st.columns(2)
     with col1:
-        bnp_total = st.number_input("基线BNP", min_value=0.0, value=0.0, step=1.0, format="%.2f")
+        bnp_total = st.number_input("基线BNP (pg/mL)", min_value=0.0, value=0.0, step=1.0, format="%.2f")
     with col2:
         post_gastric_tube = st.selectbox("术后是否留置胃管", options=[0, 1], format_func=lambda x: "是" if x == 1 else "否")
 
@@ -145,7 +145,6 @@ with right_col:
             pred_class = "高风险"
             advice = f"模型预测您的症状性出血风险概率为 {risk_prob:.1%}，属于高风险。建议立即就医，加强监测和预防措施。"
 
-        # 使用HTML将分类值显示为红色
         st.markdown(f"**预测分类：** <span class='pred-value'>{pred_class}</span>", unsafe_allow_html=True)
         st.write(f"**预测概率：** {risk_prob:.2%}")
 
