@@ -12,7 +12,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# 自定义CSS：精确控制字体大小
+# 自定义CSS：精确控制字体大小和颜色
 st.markdown("""
 <style>
     /* 三级标题样式（用于“请填写以下信息...”） */
@@ -41,7 +41,12 @@ st.markdown("""
         font-size: 2.0rem !important;
     }
     .result-area p, .result-area div, .result-area .stMarkdown {
-        font-size: 1.6rem !important;
+        font-size: 1.8rem !important;
+    }
+    /* 预测分类的值显示为红色 */
+    .pred-value {
+        color: red !important;
+        font-weight: bold;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -53,7 +58,7 @@ st.markdown("### 请填写以下信息，点击预测获取风险评估结果")
 model = joblib.load('XGBoost.pkl')
 test_dataset = pd.read_excel('data.xlsx')
 
-# 定义特征列表（根据实际列名修改）
+# 定义特征列表（根据实际列名修改，注意无空格）
 feature_names = [
     "age", "nihss_admit", "adl_total", "pre_apt", "post_gastric_tube",
     "sbp_baseline", "sbp_admit", "agitation ",   # 如果数据中无空格，请删除此处空格
@@ -140,7 +145,8 @@ with right_col:
             pred_class = "高风险"
             advice = f"模型预测您的症状性出血风险概率为 {risk_prob:.1%}，属于高风险。建议立即就医，加强监测和预防措施。"
 
-        st.write(f"**预测分类：** {pred_class}")
+        # 使用HTML将分类值显示为红色
+        st.markdown(f"**预测分类：** <span class='pred-value'>{pred_class}</span>", unsafe_allow_html=True)
         st.write(f"**预测概率：** {risk_prob:.2%}")
 
         st.subheader("💡 健康建议")
