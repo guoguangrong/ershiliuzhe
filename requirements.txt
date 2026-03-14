@@ -7,3 +7,4 @@ lime
 xgboost
 shap
 matplotlib
+openpyxl
