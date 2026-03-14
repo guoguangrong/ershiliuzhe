@@ -12,7 +12,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# 自定义CSS：强力放大输入标签和结果文字
+# 自定义CSS：精确控制字体大小
 st.markdown("""
 <style>
     /* 三级标题样式（用于“请填写以下信息...”） */
@@ -20,14 +20,14 @@ st.markdown("""
         font-size: 1.8rem !important;
         font-weight: 600 !important;
     }
-    /* 输入标签：比h3小一号，不加粗，强制覆盖所有 */
+    /* 输入标签：比h3再小一号，不加粗 */
     label[data-testid="stWidgetLabel"] p {
-        font-size: 1.6rem !important;
+        font-size: 1.4rem !important;
         font-weight: normal !important;
     }
     /* 备用选择器，确保覆盖 */
     .stNumberInput label, .stSelectbox label {
-        font-size: 1.6rem !important;
+        font-size: 1.4rem !important;
         font-weight: normal !important;
         line-height: 1.4 !important;
         margin-bottom: 0.2rem !important;
@@ -53,7 +53,7 @@ st.markdown("### 请填写以下信息，点击预测获取风险评估结果")
 model = joblib.load('XGBoost.pkl')
 test_dataset = pd.read_excel('data.xlsx')
 
-# 定义特征列表（根据实际列名修改，注意无空格）
+# 定义特征列表（根据实际列名修改）
 feature_names = [
     "age", "nihss_admit", "adl_total", "pre_apt", "post_gastric_tube",
     "sbp_baseline", "sbp_admit", "agitation ",   # 如果数据中无空格，请删除此处空格
@@ -67,7 +67,7 @@ if missing_features:
     st.stop()
 
 # ====================== 创建左右两列布局 ======================
-left_col, right_col = st.columns([3, 2])  # 左侧宽3，右侧宽2
+left_col, right_col = st.columns([3, 2])
 
 # ====================== 左侧：输入组件（每行两个）======================
 with left_col:
@@ -121,7 +121,6 @@ with right_col:
     st.subheader("📊 预测结果")
     
     if predict_clicked:
-        # 构建特征数组（顺序必须与 feature_names 一致）
         feature_values = [
             age, nihss_admit, adl_total, pre_apt, post_gastric_tube,
             sbp_baseline, sbp_admit, agitation, anc_total, bnp_total
